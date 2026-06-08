@@ -1,21 +1,25 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="carlwang.cn 正在开发中，惊喜在后面。"
+      content="carlwang.cn is still cooking. Good things need a little loading time."
     />
-    <title>carlwang.cn</title>
+    <meta name="theme-color" content="#b7d075" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='32' fill='%23b7d075'/%3E%3C/svg%3E"
+    />
+    <title>Carl Wang - Home</title>
     <style>
       :root {
         color-scheme: light;
-        --bg: #f5f5f7;
-        --fg: #1d1d1f;
-        --muted: #6e6e73;
-        --line: rgba(29, 29, 31, 0.14);
-        --accent: #0071e3;
+        --bg: #ffffff;
+        --fg: #050505;
+        --muted: #111111;
+        --accent: #b7d075;
       }
 
       * {
@@ -30,18 +34,42 @@
       body {
         margin: 0;
         min-height: 100vh;
+        overflow: hidden;
         font-family: "SF Pro Display", "SF Pro Text", -apple-system,
-          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
         color: var(--fg);
-        background:
-          radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.9), transparent 34rem),
-          linear-gradient(180deg, #fbfbfd 0%, var(--bg) 72%);
+        background: #f8fbf2;
         -webkit-font-smoothing: antialiased;
         text-rendering: geometricPrecision;
       }
 
+      body::before {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+        pointer-events: none;
+        content: "";
+        background:
+          radial-gradient(
+            ellipse at 50% 38%,
+            rgba(255, 255, 255, 0.72),
+            rgba(255, 255, 255, 0.28) 22rem,
+            transparent 48rem
+          );
+      }
+
+      .scene-canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+      }
+
       .page {
         position: relative;
+        z-index: 2;
         display: grid;
         min-height: 100vh;
         grid-template-rows: 1fr auto;
@@ -56,92 +84,381 @@
 
       .content {
         width: min(100%, 760px);
+        transform: translateY(-7vh);
+      }
+
+      .reveal {
+        opacity: 0;
+        filter: blur(18px);
+        transform: translateY(18px);
+        animation: reveal 900ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        animation-delay: var(--delay, 0ms);
       }
 
       .brand {
-        margin: 0 0 22px;
-        font-size: clamp(17px, 2vw, 21px);
-        font-weight: 500;
-        letter-spacing: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        margin: 0 0 26px;
+        font-family: "SF Pro Text", "SF Pro Display", -apple-system,
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 590;
         color: var(--muted);
+      }
+
+      .mark {
+        position: relative;
+        display: inline-grid;
+        width: 14px;
+        height: 14px;
+        place-items: center;
+        border-radius: 50%;
+        background: rgba(183, 208, 117, 0.36);
+        box-shadow: 0 0 18px rgba(183, 208, 117, 0.55);
+      }
+
+      .mark::before,
+      .mark::after {
+        grid-area: 1 / 1;
+        width: 6px;
+        height: 6px;
+        border-radius: inherit;
+        background: var(--accent);
+        content: "";
+      }
+
+      .mark::after {
+        width: 14px;
+        height: 14px;
+        border: 1px solid rgba(183, 208, 117, 0.96);
+        background: transparent;
+        animation: orbit 1.9s linear infinite, pulse 1.9s ease-in-out infinite;
       }
 
       h1 {
         margin: 0;
-        font-size: clamp(42px, 7vw, 88px);
-        font-weight: 700;
-        line-height: 1.05;
-        letter-spacing: 0;
+        font-family: "SF Pro Display", "SF Pro Text", -apple-system,
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+        font-size: 80px;
+        font-variation-settings: "wdth" 100;
+        font-weight: 590;
+        line-height: normal;
+        letter-spacing: -0.08px;
       }
 
       .subtitle {
-        margin: 22px auto 0;
-        max-width: 560px;
-        font-size: clamp(19px, 2.6vw, 28px);
-        font-weight: 500;
-        line-height: 1.42;
-        color: var(--muted);
-      }
-
-      .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-        margin-top: 34px;
-        padding: 10px 16px;
-        border: 1px solid var(--line);
-        border-radius: 999px;
-        background: rgba(255, 255, 255, 0.66);
-        color: var(--fg);
-        font-size: 15px;
-        font-weight: 500;
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-      }
-
-      .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 0 6px rgba(0, 113, 227, 0.12);
+        margin: 18px auto 0;
+        max-width: 620px;
+        font-family: "SF Pro Text", "SF Pro Display", -apple-system,
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+        font-size: 22px;
+        font-weight: 590;
+        line-height: 1.36;
+        color: rgba(5, 5, 5, 0.5);
       }
 
       footer {
         padding-top: 28px;
         text-align: center;
-        color: var(--muted);
-        font-size: 13px;
-        line-height: 1.6;
+        color: rgba(5, 5, 5, 0.5);
+        font-family: "SF Pro Text", "SF Pro Display", -apple-system,
+          BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 1.5;
       }
 
-      @media (max-width: 560px) {
-        .page {
-          padding: 24px 20px;
+      @keyframes reveal {
+        to {
+          opacity: 1;
+          filter: blur(0);
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes orbit {
+        to {
+          rotate: 360deg;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          scale: 0.96;
+          opacity: 0.68;
         }
 
-        .status {
-          width: 100%;
-          justify-content: center;
-          border-radius: 18px;
+        50% {
+          scale: 1.18;
+          opacity: 1;
+        }
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        body {
+          cursor: default;
+        }
+      }
+
+      @media (max-width: 680px) {
+        body {
+          overflow: auto;
+        }
+
+        .page {
+          padding: 26px 20px;
+        }
+
+        .content {
+          transform: translateY(-4vh);
+        }
+
+        h1 {
+          font-size: clamp(52px, 16vw, 80px);
+        }
+
+        .subtitle {
+          margin-top: 20px;
+          font-size: clamp(18px, 5.6vw, 22px);
+        }
+
+        footer {
+          font-size: 13px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 1ms !important;
+          animation-iteration-count: 1 !important;
+          scroll-behavior: auto !important;
+          transition-duration: 1ms !important;
+        }
+
+        .reveal {
+          opacity: 1;
+          filter: none;
+          transform: none;
         }
       }
     </style>
   </head>
   <body>
+    <canvas class="scene-canvas" aria-hidden="true"></canvas>
     <div class="page">
       <main aria-labelledby="page-title">
         <section class="content">
-          <p class="brand">carlwang.cn</p>
-          <h1 id="page-title">正在开发中</h1>
-          <p class="subtitle">惊喜在后面。</p>
-          <div class="status" aria-label="网站状态">
-            <span class="dot" aria-hidden="true"></span>
-            <span>Building something new</span>
-          </div>
+          <p class="brand reveal" style="--delay: 120ms">
+            <span class="mark" aria-hidden="true"></span>
+            <span>carlwang.cn</span>
+          </p>
+          <h1 class="reveal" id="page-title" style="--delay: 260ms">
+            Still cooking.
+          </h1>
+          <p class="subtitle reveal" style="--delay: 420ms">
+            Good things need a little loading time.
+          </p>
         </section>
       </main>
-      <footer>© carlwang. All rights reserved.</footer>
+      <footer class="reveal" style="--delay: 620ms">
+        &copy; carlwang. All rights reserved.
+      </footer>
     </div>
+
+    <script>
+      const canvas = document.querySelector(".scene-canvas");
+      const ctx = canvas.getContext("2d", { alpha: false });
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const pointer = {
+        x: window.innerWidth * 0.5,
+        y: window.innerHeight * 0.72,
+        tx: window.innerWidth * 0.5,
+        ty: window.innerHeight * 0.72,
+      };
+      const wakes = [];
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let noisePattern;
+      let lastWake = 0;
+
+      function makeNoisePattern() {
+        const size = 160;
+        const tile = document.createElement("canvas");
+        const tileCtx = tile.getContext("2d");
+        tile.width = size;
+        tile.height = size;
+
+        const image = tileCtx.createImageData(size, size);
+        for (let i = 0; i < image.data.length; i += 4) {
+          const value = 120 + Math.random() * 90;
+          const alpha = Math.random() * 32;
+          image.data[i] = value * 0.88;
+          image.data[i + 1] = value;
+          image.data[i + 2] = value * 0.52;
+          image.data[i + 3] = alpha;
+        }
+        tileCtx.putImageData(image, 0, 0);
+        return ctx.createPattern(tile, "repeat");
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = `${width}px`;
+        canvas.style.height = `${height}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        noisePattern = makeNoisePattern();
+      }
+
+      function addWake(x, y, time) {
+        wakes.push({ x, y, time });
+        if (wakes.length > 18) wakes.shift();
+      }
+
+      function setPointer(event) {
+        pointer.tx = event.clientX;
+        pointer.ty = event.clientY;
+        if (event.timeStamp - lastWake > 90) {
+          addWake(event.clientX, event.clientY, event.timeStamp);
+          lastWake = event.timeStamp;
+        }
+      }
+
+      function drawBackground(time) {
+        const phase = time * 0.00022;
+        ctx.fillStyle = "#f8fbf2";
+        ctx.fillRect(0, 0, width, height);
+
+        const wash = ctx.createLinearGradient(0, 0, 0, height);
+        wash.addColorStop(0, "rgba(255, 255, 255, 0.72)");
+        wash.addColorStop(0.42, "rgba(249, 252, 244, 0.88)");
+        wash.addColorStop(1, "rgba(226, 241, 191, 0.62)");
+        ctx.fillStyle = wash;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.save();
+        ctx.globalAlpha = 0.24;
+        ctx.fillStyle = noisePattern;
+        ctx.fillRect(0, 0, width, height);
+        ctx.restore();
+
+        ctx.save();
+        ctx.globalAlpha = 0.14;
+        ctx.fillStyle = "rgba(80, 95, 55, 0.34)";
+        const typeSize = Math.max(150, width * 0.18);
+        ctx.font = `700 ${typeSize}px "SF Pro Display", "Helvetica Neue", Arial, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "alphabetic";
+        ctx.fillText("CARL WANG", width * 0.5, height + typeSize * 0.02);
+        ctx.restore();
+
+        const beamY =
+          height * 0.66 +
+          Math.sin(phase * 8) * 22 +
+          (pointer.y / height - 0.5) * 28;
+        const beam = ctx.createLinearGradient(0, beamY - 80, 0, beamY + 110);
+        beam.addColorStop(0, "rgba(183, 208, 117, 0)");
+        beam.addColorStop(0.42, "rgba(183, 208, 117, 0.08)");
+        beam.addColorStop(0.52, "rgba(255, 255, 255, 0.34)");
+        beam.addColorStop(0.62, "rgba(120, 180, 132, 0.09)");
+        beam.addColorStop(1, "rgba(183, 208, 117, 0)");
+        ctx.fillStyle = beam;
+        ctx.fillRect(0, beamY - 90, width, 210);
+
+        const floorY = height * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(0, height);
+        for (let x = 0; x <= width + 24; x += 24) {
+          const pull = Math.max(0, 1 - Math.abs(x - pointer.x) / (width * 0.34));
+          const y =
+            floorY +
+            Math.sin(x * 0.006 + phase * 18) * 18 +
+            Math.sin(x * 0.014 - phase * 10) * 8 -
+            pull * 34;
+          ctx.lineTo(x, y);
+        }
+        ctx.lineTo(width, height);
+        ctx.closePath();
+        const floor = ctx.createLinearGradient(0, floorY - 60, 0, height);
+        floor.addColorStop(0, "rgba(183, 208, 117, 0)");
+        floor.addColorStop(0.32, "rgba(183, 208, 117, 0.18)");
+        floor.addColorStop(0.74, "rgba(201, 224, 139, 0.32)");
+        floor.addColorStop(1, "rgba(116, 170, 145, 0.16)");
+        ctx.fillStyle = floor;
+        ctx.fill();
+      }
+
+      function drawRipples(time) {
+        for (let i = wakes.length - 1; i >= 0; i--) {
+          const wake = wakes[i];
+          const age = (time - wake.time) / 1200;
+          if (age > 1) {
+            wakes.splice(i, 1);
+            continue;
+          }
+          const radius = 42 + age * 210;
+          const alpha = (1 - age) * 0.16;
+          ctx.save();
+          ctx.translate(wake.x, wake.y);
+          ctx.scale(1.7, 0.38);
+          ctx.strokeStyle = `rgba(98, 150, 86, ${alpha})`;
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+
+      function drawCursorRefraction(time) {
+        const shimmerWidth = Math.min(520, width * 0.32);
+        const shimmer = ctx.createLinearGradient(
+          pointer.x - shimmerWidth,
+          pointer.y,
+          pointer.x + shimmerWidth,
+          pointer.y
+        );
+        shimmer.addColorStop(0, "rgba(183, 208, 117, 0)");
+        shimmer.addColorStop(0.36, "rgba(183, 208, 117, 0.08)");
+        shimmer.addColorStop(0.5, "rgba(255, 255, 255, 0.46)");
+        shimmer.addColorStop(0.64, "rgba(101, 176, 150, 0.07)");
+        shimmer.addColorStop(1, "rgba(183, 208, 117, 0)");
+
+        ctx.save();
+        ctx.translate(0, Math.sin(time * 0.003) * 4);
+        ctx.globalAlpha = 0.72;
+        ctx.fillStyle = shimmer;
+        ctx.beginPath();
+        ctx.ellipse(pointer.x, pointer.y, shimmerWidth, 18, -0.02, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function render(time = 0) {
+        pointer.x += (pointer.tx - pointer.x) * 0.075;
+        pointer.y += (pointer.ty - pointer.y) * 0.075;
+
+        drawBackground(time);
+        drawRipples(time);
+        drawCursorRefraction(time);
+
+        if (!reducedMotion.matches) {
+          requestAnimationFrame(render);
+        }
+      }
+
+      window.addEventListener("resize", resize);
+      window.addEventListener("pointermove", setPointer, { passive: true });
+      resize();
+      requestAnimationFrame(render);
+    </script>
   </body>
 </html>
